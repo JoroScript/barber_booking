@@ -1,0 +1,5 @@
+# Node modules
+node_modules/
+
+# Service account key
+src/backend/service-account-key.json
