@@ -1,0 +1,79 @@
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.border-primary {
+  border-color: #4CAF50;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.bg-white\/50 {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.w-8 {
+  width: 2rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
+.border-4 {
+  border-width: 4px;
+}
+
+.border-t-transparent {
+  border-top-color: transparent;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+} 

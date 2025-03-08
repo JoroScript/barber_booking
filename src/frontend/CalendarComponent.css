@@ -4,9 +4,7 @@
   margin: 0 auto;
   padding: 30px;
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: white;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* Loading states */
@@ -168,9 +166,8 @@
 
 /* Today's date */
 .react-calendar__tile--now {
-  background: #fffde7;
-
-  font-weight: 600;
+  background-color: transparent;
+  font-weight: bolder;
 }
 
 .react-calendar__tile--now:enabled:hover,
@@ -201,6 +198,7 @@
 .react-calendar__tile:disabled, 
 .fully-booked-date {
   color: #d32f2f;
+  background-color: transparent;
   cursor: not-allowed;
   opacity: 0.8;
 }
@@ -304,7 +302,6 @@ button.react-calendar__tile--active.selected-date-tile {
   padding: 20px;
   color: white;
   border-radius: 10px;
-  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1);
 }
 
 .booking-title {
@@ -534,9 +531,6 @@ button.react-calendar__tile--active.selected-date-tile {
 }
 
 /* Calendar styles */
-.calendar-wrapper {
-  margin: 20px 0;
-}
 
 .custom-calendar {
   width: 100%;
@@ -746,7 +740,7 @@ h3{
 }
 
 /* Loading indicator */
-.loading-overlay {
+/* .loading-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -768,7 +762,7 @@ h3{
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 10px;
-}
+} */
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
