@@ -55,7 +55,6 @@ const barberCalendars = {
   'simo': 'georgiatanasov403@gmail.com',
   'rado': 'georgiatanasov403@gmail.com',
   // If no barber is specified, use the default calendar
-  'default': 'annoyedpigeon25@gmail.com'
 };
 
 // Helper function to get calendar ID based on barber ID

@@ -1,0 +1,41 @@
+/* Navigation styles */
+.nav-scrolled {
+  background: linear-gradient(to bottom, #000000, #111111);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.nav-transparent {
+  background: transparent;
+}
+
+/* Ensure mobile navigation has background */
+@media (max-width: 768px) {
+  .nav-scrolled {
+    background: #000000 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
+  }
+  
+  .mobile-menu {
+    background-color: #000000;
+  }
+  
+  /* Force background on mobile */
+  nav {
+    background-color: #000000 !important;
+    transition: opacity 0.3s ease !important;
+  }
+  
+  /* When at top, make nav slightly transparent */
+  .nav-transparent {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+  }
+}
+
+/* Fix for iOS devices */
+@supports (-webkit-touch-callout: none) {
+  .nav-scrolled {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.9) !important;
+  }
+} 

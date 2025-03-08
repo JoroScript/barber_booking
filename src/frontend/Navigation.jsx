@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom'; // Assuming you're using Next.js
 import "./styles/animations.css";
+import "./styles/navigation.css";
 
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -38,14 +39,15 @@ const Navigation = () => {
   }, []);
   
   return (
-    <nav className="w-full fixed top-0 z-50">
+    <nav className={`w-full fixed top-0 z-50 transition-all duration-300 ${scrolled ? 'nav-scrolled' : 'nav-transparent'}`}>
       {/* Gradient background with opacity transition */}
       <div 
-        className="absolute inset-0 bg-black transition-all duration-500 ease-in-out"
+        className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+          scrolled ? 'opacity-100' : 'opacity-0'
+        }`}
         style={{ 
-          opacity: scrolled ? .7 : 0,
-          boxShadow: scrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
-          transform: scrolled ? 'translateY(0)' : 'translateY(-5px)'
+          background: scrolled ? 'linear-gradient(to bottom, #000000, #111111)' : 'transparent',
+          boxShadow: scrolled ? '0 4px 10px rgba(0, 0, 0, 0.5)' : 'none'
         }}
       ></div>
       
@@ -74,11 +76,7 @@ const Navigation = () => {
               >
                 <Link 
                   to="/" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 relative overflow-hidden group ${
-                    scrolled 
-                      ? 'text-gray-300 hover:text-black' 
-                      : 'text-white hover:text-black'
-                  }`}
+                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:text-gray-300 transition-all duration-300 relative overflow-hidden group"
                 >
                   <span className="relative z-10">Home</span>
                   <span className="absolute bottom-0 left-0 w-full h-0 bg-white bg-opacity-20 transition-all duration-300 group-hover:h-full"></span>
@@ -91,11 +89,7 @@ const Navigation = () => {
               >
                 <Link 
                   to="/booking" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 relative overflow-hidden group ${
-                    scrolled 
-                      ? 'text-gray-300 hover:text-black' 
-                      : 'text-white hover:text-black'
-                  }`}
+                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:text-gray-300 transition-all duration-300 relative overflow-hidden group"
                 >
                   <span className="relative z-10">Booking</span>
                   <span className="absolute bottom-0 left-0 w-full h-0 bg-white bg-opacity-20 transition-all duration-300 group-hover:h-full"></span>
@@ -104,7 +98,7 @@ const Navigation = () => {
             </ul>
           </div>
           
-          {/* Mobile Navigation Button with pulse animation */}
+          {/* Mobile Navigation Button */}
           <div 
             className={`md:hidden transition-all duration-700 delay-300 ease-out ${
               animateItems ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
@@ -112,15 +106,10 @@ const Navigation = () => {
           >
             <button 
               type="button" 
-              className={`inline-flex items-center justify-center p-2 rounded-md ${
-                scrolled 
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
-                  : 'text-white hover:bg-black hover:bg-opacity-30'
-              } focus:outline-none transition-transform duration-300 hover:scale-110`}
+              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-300 hover:bg-black hover:bg-opacity-30 focus:outline-none transition-transform duration-300 hover:scale-110"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <span className="sr-only">Open main menu</span>
-              {/* Animated Menu Icon */}
               <div className="w-6 h-6 relative">
                 <span 
                   className={`absolute h-0.5 w-full bg-current transform transition-all duration-300 ease-in-out ${
@@ -143,27 +132,25 @@ const Navigation = () => {
         </div>
       </div>
       
-      {/* Mobile Menu with slide-down animation */}
+      {/* Mobile Menu */}
       <div 
         className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
           mobileMenuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className={`relative z-10 px-2 pt-2 pb-3 space-y-1 sm:px-3 ${
-          scrolled 
-            ? 'bg-gray-800' 
-            : 'bg-black bg-opacity-70'
+        <div className={`relative z-10 px-2 pt-2 pb-3 space-y-1 sm:px-3 mobile-menu ${
+          scrolled ? 'bg-black' : 'bg-black bg-opacity-95'
         }`}>
           <Link 
             to="/" 
-            className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 transition-all duration-300 hover:pl-5"
+            className="text-white hover:text-gray-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white hover:bg-opacity-10 transition-all duration-300"
             onClick={() => setMobileMenuOpen(false)}
           >
             Home
           </Link>
           <Link 
             to="/booking" 
-            className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 transition-all duration-300 hover:pl-5"
+            className="text-white hover:text-gray-300 block px-3 py-2 rounded-md text-base font-medium hover:bg-white hover:bg-opacity-10 transition-all duration-300"
             onClick={() => setMobileMenuOpen(false)}
           >
             Booking
