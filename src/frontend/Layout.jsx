@@ -52,7 +52,7 @@ export default function Layout() {
       <Navigation />
       <main 
         ref={mainRef}
-        className={`flex flex-col w-full justify-center bg-gradient-to-b from-red-700 via-red-900 to-black ${
+        className={`flex flex-col w-full justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 ${
           useFullHeight ? 'h-full min-h-screen' : 'h-screen'
         }`}
       >

@@ -1,0 +1,15 @@
+{
+  "name": "barber-booking-tests",
+  "version": "1.0.0",
+  "description": "Performance tests for the barber booking system",
+  "type": "module",
+  "scripts": {
+    "test": "node performance-test.js",
+    "load-test": "node load-test.js",
+    "simple-test": "node simple-test.js",
+    "realistic-test": "node realistic-test.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+} 
