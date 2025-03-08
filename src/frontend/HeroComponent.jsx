@@ -1,6 +1,6 @@
 // HeroComponent.jsx
 import { Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import "./styles/animations.css";
 import hatchetImage from './assets/hatchet.png'; // Import the hatchet image
 
@@ -8,48 +8,57 @@ const HeroComponent = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const animationFrameRef = useRef(null);
+  const throttleRef = useRef(false);
 
   useEffect(() => {
-    // Trigger animations after component mounts
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 300);
+    // Preload the hatchet image
+    const img = new Image();
+    img.src = hatchetImage;
+    img.onload = () => {
+      setImagesLoaded(true);
+      // Trigger animations after component mounts and image loads
+      setTimeout(() => {
+        setIsLoaded(true);
+      }, 300);
+    };
     
-    // Track mouse movement for parallax effect
+    // Track mouse movement for parallax effect with throttling
     const handleMouseMove = (e) => {
-      setMousePosition({
-        x: e.clientX / window.innerWidth - 0.5,
-        y: e.clientY / window.innerHeight - 0.5
+      if (throttleRef.current) return;
+      
+      throttleRef.current = true;
+      
+      // Use requestAnimationFrame for smoother performance
+      animationFrameRef.current = requestAnimationFrame(() => {
+        setMousePosition({
+          x: e.clientX / window.innerWidth - 0.5,
+          y: e.clientY / window.innerHeight - 0.5
+        });
+        
+        setTimeout(() => {
+          throttleRef.current = false;
+        }, 16); // Throttle to ~60fps
       });
     };
     
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     
     return () => {
-      clearTimeout(timer);
       window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, []);
 
-  return (
-    <div className="relative w-full h-screen overflow-hidden">
-      {/* Dark background with gradient for contrast with white hatchet */}
-      <div 
-        className={`absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800 transition-opacity duration-1000 ease-out ${
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{
-          backgroundPosition: `${50 + mousePosition.x * 10}% ${50 + mousePosition.y * 10}%`
-        }}
-      >
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute w-full h-full bg-grid-pattern"></div>
-        </div>
-      </div>
-      
-      {/* Animated hatchets container */}
-      <div className="absolute inset-0 overflow-hidden">
+  // Memoize the hatchet elements to prevent unnecessary re-renders
+  const renderHatchets = () => {
+    if (!imagesLoaded) return null;
+    
+    return (
+      <>
         {/* Main large hatchet */}
         <div 
           className={`absolute w-64 h-64 transition-all duration-1000 ease-out ${
@@ -60,10 +69,17 @@ const HeroComponent = () => {
             right: `calc(10% + ${mousePosition.x * -20}px)`,
             transformOrigin: 'center center',
             animation: 'floatAndSpin 15s ease-in-out infinite',
-            filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.5))'
+            filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.5))',
+            willChange: 'transform'
           }}
         >
-          <img src={hatchetImage} alt="Hatchet" className="w-full h-full object-contain" />
+          <img 
+            src={hatchetImage} 
+            alt="Hatchet" 
+            className="w-full h-full object-contain"
+            loading="eager"
+            fetchpriority="high"
+          />
         </div>
         
         {/* Medium hatchet with swing animation */}
@@ -76,10 +92,16 @@ const HeroComponent = () => {
             left: `calc(10% + ${mousePosition.x * 20}px)`,
             transformOrigin: 'center center',
             animation: 'swingAndFloat 12s ease-in-out infinite',
-            filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.4))'
+            filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.4))',
+            willChange: 'transform'
           }}
         >
-          <img src={hatchetImage} alt="Hatchet" className="w-full h-full object-contain" />
+          <img 
+            src={hatchetImage} 
+            alt="Hatchet" 
+            className="w-full h-full object-contain"
+            loading="lazy"
+          />
         </div>
         
         {/* Small hatchet with spin animation */}
@@ -92,14 +114,20 @@ const HeroComponent = () => {
             left: `calc(25% + ${mousePosition.x * -15}px)`,
             transformOrigin: 'center center',
             animation: 'floatAndSpin 10s ease-in-out infinite reverse',
-            filter: 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))'
+            filter: 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))',
+            willChange: 'transform'
           }}
         >
-          <img src={hatchetImage} alt="Hatchet" className="w-full h-full object-contain" />
+          <img 
+            src={hatchetImage} 
+            alt="Hatchet" 
+            className="w-full h-full object-contain"
+            loading="lazy"
+          />
         </div>
         
         {/* Extra small floating hatchets with physics - just a few */}
-        {[...Array(5)].map((_, index) => {
+        {[...Array(3)].map((_, index) => {
           // Randomize animation type
           const animationType = index % 3 === 0 
             ? 'floatAndSpin' 
@@ -134,13 +162,43 @@ const HeroComponent = () => {
                 transformOrigin: 'center center',
                 animation: `${animationType} ${duration}s ease-in-out infinite ${index % 2 ? 'reverse' : ''}`,
                 animationDelay: `${delay}s`,
-                filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.2))'
+                filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.2))',
+                willChange: 'transform'
               }}
             >
-              <img src={hatchetImage} alt="Hatchet" className="w-full h-full object-contain" />
+              <img 
+                src={hatchetImage} 
+                alt="Hatchet" 
+                className="w-full h-full object-contain"
+                loading="lazy"
+              />
             </div>
           );
         })}
+      </>
+    );
+  };
+
+  return (
+    <div className="relative w-full h-screen overflow-hidden">
+      {/* Dark background with gradient for contrast with white hatchet */}
+      <div 
+        className={`absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800 transition-opacity duration-1000 ease-out ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{
+          backgroundPosition: `${50 + mousePosition.x * 10}% ${50 + mousePosition.y * 10}%`
+        }}
+      >
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute w-full h-full bg-grid-pattern"></div>
+        </div>
+      </div>
+      
+      {/* Animated hatchets container */}
+      <div className="absolute inset-0 overflow-hidden">
+        {renderHatchets()}
       </div>
       
       {/* Text Content with staggered animations */}
@@ -230,7 +288,6 @@ const HeroComponent = () => {
             isLoaded ? 'opacity-70 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-         
         </div>
       </div>
     </div>

@@ -17,7 +17,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .step-number {
@@ -32,6 +32,8 @@
   font-weight: bold;
   margin-bottom: 0.5rem;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .step.active .step-number {
@@ -49,6 +51,8 @@
   color: #666;
   text-align: center;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .step.active .step-label {
@@ -67,7 +71,7 @@
   right: 0;
   height: 2px;
   background-color: #e0e0e0;
-  z-index: 0;
+  z-index: 1;
 }
 
 .step-connector-progress {

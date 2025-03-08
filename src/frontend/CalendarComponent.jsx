@@ -39,7 +39,6 @@ const BookingContent = () => {
 
   return (
     <div className="booking-container">
-      {!bookingConfirmed && <h2 className="booking-title">Запази си Час</h2>}
 
       {!bookingConfirmed && <StepIndicator />}
 

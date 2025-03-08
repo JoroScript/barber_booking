@@ -1,12 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useBooking } from '../../../contexts/BookingContext';
-import { DateTime } from 'luxon';
 import './BookingConfirmation.css';
 
 const BookingConfirmation = () => {
   const { bookingSummary, resetBooking } = useBooking();
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    
+    // Add class to body to prevent horizontal scrolling
+    document.body.classList.add('no-horizontal-scroll');
+    
+    // Cleanup
+    return () => {
+      document.body.classList.remove('no-horizontal-scroll');
+    };
+  }, []);
 
-  if (!bookingSummary) return null;
+  if (!bookingSummary) {
+    return (
+      <div className="booking-confirmation">
+        <div className="confirmation-message">
+          Няма информация за резервация. Моля, започнете процеса на резервация отначало.
+        </div>
+        <div className="confirmation-actions">
+          <button 
+            type="button" 
+            className="new-booking-button"
+            onClick={resetBooking}
+          >
+            Нова Резервация
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="booking-confirmation">
@@ -16,11 +45,15 @@ const BookingConfirmation = () => {
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
           </svg>
         </div>
-        <h3>Успешно Запазен Час</h3>
+        <h3>Успешно запазен час</h3>
+      </div>
+      
+      <div className="confirmation-message">
+        Благодарим ви, че избрахте нашия салон. Вашата резервация е потвърдена. По-долу можете да видите детайлите за вашия час.
       </div>
       
       <div className="booking-summary">
-        <h4>Данни за Услугата</h4>
+        <h4>Детайли за резервацията</h4>
         <div className="summary-details">
           <div className="summary-row">
             <span className="summary-label">Бръснар:</span>
@@ -32,15 +65,15 @@ const BookingConfirmation = () => {
           </div>
           <div className="summary-row">
             <span className="summary-label">Дата:</span>
-            <span className="summary-value">{DateTime.fromISO(bookingSummary.date).toFormat("dd/MM/yyyy")}</span>
+            <span className="summary-value">{bookingSummary.date}</span>
           </div>
           <div className="summary-row">
             <span className="summary-label">Час:</span>
             <span className="summary-value">{bookingSummary.time}</span>
           </div>
           <div className="summary-row">
-            <span className="summary-label">Времетраене:</span>
-            <span className="summary-value">{bookingSummary.duration} мин.</span>
+            <span className="summary-label">Продължителност:</span>
+            <span className="summary-value">{bookingSummary.duration} минути</span>
           </div>
           <div className="summary-row">
             <span className="summary-label">Цена:</span>
@@ -50,14 +83,14 @@ const BookingConfirmation = () => {
       </div>
       
       <div className="customer-details">
-        <h4>Вашите Данни</h4>
+        <h4>Вашите данни</h4>
         <div className="summary-details">
           <div className="summary-row">
             <span className="summary-label">Име:</span>
             <span className="summary-value">{bookingSummary.customerName}</span>
           </div>
           <div className="summary-row">
-            <span className="summary-label">Email:</span>
+            <span className="summary-label">Имейл:</span>
             <span className="summary-value">{bookingSummary.customerEmail}</span>
           </div>
           <div className="summary-row">

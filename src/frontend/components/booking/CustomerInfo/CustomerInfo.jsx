@@ -207,7 +207,7 @@ const CustomerInfo = () => {
               Processing...
             </>
           ) : (
-            'Book Appointment'
+            'Запази Час'
           )}
         </button>
       </form>

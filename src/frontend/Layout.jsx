@@ -1,30 +1,33 @@
-import {Outlet} from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navigation from './Navigation';
-import { useEffect, useRef, useState } from 'react';
 
 export default function Layout() {
+  const [useFullHeight, setUseFullHeight] = useState(false);
   const mainRef = useRef(null);
-  const [useFullHeight, setUseFullHeight] = useState(true);
+  const location = useLocation();
   
-  useEffect(() => {
-    // Function to check if content exceeds viewport height
-    const checkContentHeight = () => {
-      if (!mainRef.current) return;
-      
+  // Check if we're on the booking confirmation page
+  const isBookingConfirmation = location.pathname === '/booking' && 
+    location.search.includes('step=5') && 
+    location.search.includes('confirmed=true');
+
+  // Function to check if content exceeds viewport height
+  const checkContentHeight = () => {
+    if (mainRef.current) {
       const contentHeight = mainRef.current.scrollHeight;
       const viewportHeight = window.innerHeight;
-      const navHeight = document.querySelector('nav')?.offsetHeight || 0;
-      const availableHeight = viewportHeight - navHeight;
       
-      // If content height is greater than available viewport height, use h-full
-      // Otherwise use h-screen
-      setUseFullHeight(contentHeight > availableHeight);
-    };
-    
-    // Check on initial render
+      // If content is taller than viewport or we're on booking confirmation, use full height
+      setUseFullHeight(contentHeight > viewportHeight || isBookingConfirmation);
+    }
+  };
+
+  useEffect(() => {
+    // Check content height on mount and when location changes
     checkContentHeight();
     
-    // Check on window resize
+    // Add resize listener
     window.addEventListener('resize', checkContentHeight);
     
     // Create a ResizeObserver to detect content size changes
@@ -32,7 +35,7 @@ export default function Layout() {
       checkContentHeight();
     });
     
-    // Observe the main element
+    // Start observing the main element
     if (mainRef.current) {
       resizeObserver.observe(mainRef.current);
     }
@@ -45,19 +48,25 @@ export default function Layout() {
       }
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [location, isBookingConfirmation]); // Re-run when location or isBookingConfirmation changes
   
   return (
-    <>
+    <div className="flex flex-col w-full overflow-x-hidden">
       <Navigation />
       <main 
         ref={mainRef}
         className={`flex flex-col w-full justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 ${
-          useFullHeight ? 'h-full min-h-screen' : 'h-screen'
+          useFullHeight || isBookingConfirmation ? 'min-h-screen' : 'h-screen'
         }`}
+        style={{
+          paddingTop: isBookingConfirmation ? '0' : undefined, // Remove top padding for booking confirmation
+          overflow: 'auto', // Ensure content is scrollable if it exceeds viewport height
+          maxWidth: '100vw', // Prevent horizontal overflow
+          overflowX: 'hidden' // Hide horizontal overflow
+        }}
       >
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }
