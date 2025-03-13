@@ -55,10 +55,10 @@ const BookingContent = () => {
       </div>
 
       <UnavailableSlotModal
-        isOpen={modalOpen}
-        onClose={handleModalClose}
-        message={modalMessage}
-      />
+  isOpen={modalOpen}
+  onClose={handleModalClose}
+  message={modalMessage}
+/>
     </div>
   );
 };

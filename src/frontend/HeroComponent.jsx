@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import "./styles/animations.css";
 import hatchetImage from './assets/hatchet.png'; // Import the hatchet image
-
+import FadeIn from './components/common/FadeIn';
 const HeroComponent = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [imagesLoaded, setImagesLoaded] = useState(false);
@@ -18,10 +18,7 @@ const HeroComponent = () => {
     img.src = hatchetImage;
     img.onload = () => {
       setImagesLoaded(true);
-      // Trigger animations after component mounts and image loads
-      setTimeout(() => {
-        setIsLoaded(true);
-      }, 300);
+      
     };
     
     // Track mouse movement for parallax effect with throttling
@@ -211,6 +208,8 @@ const HeroComponent = () => {
             transform: `translateX(${mousePosition.x * -10}px) translateY(${mousePosition.y * -10}px)`
           }}
         >
+          <FadeIn duration={300}>
+
           <span className="inline-block overflow-hidden">
             <span className="inline-block animate-wave">T</span>
             <span className="inline-block animate-wave" style={{ animationDelay: '0.1s' }}>h</span>
@@ -222,8 +221,10 @@ const HeroComponent = () => {
             <span className="inline-block animate-wave" style={{ animationDelay: '0.7s' }}>z</span>
           </span>
           <span className="block mt-2 text-gradient">Barbershop</span>
+          </FadeIn>
         </h1>
-        
+        <FadeIn duration={600}>
+
         <p 
           className={`text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl transition-all duration-1000 delay-300 ease-out ${
             isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
@@ -231,10 +232,12 @@ const HeroComponent = () => {
           style={{
             transform: `translateX(${mousePosition.x * -5}px) translateY(${mousePosition.y * -5}px)`
           }}
-        >
+          >
           Освежи Визията Си
         </p>
-        
+          </FadeIn>
+        <FadeIn duration={800}>
+
         {/* Animated button */}
         <div 
           className={`transition-all duration-1000 delay-600 ease-out ${
@@ -242,20 +245,17 @@ const HeroComponent = () => {
           }`}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          style={{
-            transform: `translateX(${mousePosition.x * -3}px) translateY(${mousePosition.y * -3}px)`
-          }}
-        >
+          >
           <Link 
             to="/booking" 
             className="relative inline-block px-8 py-4 text-white font-medium rounded-lg overflow-hidden group"
-          >
+            >
             {/* Button background with hover effect */}
             <span 
               className={`absolute inset-0 bg-gradient-to-r from-amber-700 to-amber-900 transition-all duration-500 ease-out ${
                 isHovered ? 'opacity-100' : 'opacity-90'
               }`}
-            ></span>
+              ></span>
             
             {/* Animated border */}
             <span className="absolute inset-0 border border-amber-500 opacity-30 rounded-lg"></span>
@@ -272,7 +272,7 @@ const HeroComponent = () => {
                 width: '300%',
                 height: '100%'
               }}
-            ></span>
+              ></span>
             
             {/* Button text */}
             <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">
@@ -281,6 +281,7 @@ const HeroComponent = () => {
             </span>
           </Link>
         </div>
+              </FadeIn>
         
         {/* Animated scroll indicator */}
         <div 
