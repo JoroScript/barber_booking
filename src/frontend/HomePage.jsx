@@ -14,10 +14,10 @@ export default function HomePage()
           <FadeIn duration={600}>
             <BusinessCard name={"Мирослав"} info={"Младши бръснар"} specific={"Специалист в класически подстригвания"}/>
           </FadeIn>
-          <FadeIn duration={800}>
+          <FadeIn duration={1000}>
             <BusinessCard name={"Радослав"} info={"Старши бръснар"} specific={"Специалист в модерни прически"}/>
           </FadeIn>
-          <FadeIn duration={1000}>
+          <FadeIn duration={1500}>
             <BusinessCard name={"Симеон"} info={"Опитен бръснар"} specific={"Майстор на бради и фейд подстригвания"}/>
           </FadeIn>
           
