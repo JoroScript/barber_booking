@@ -12,9 +12,8 @@ const Navigation = () => {
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10; // Adjust this value as needed
-      if (isScrolled !== scrolled) {
+      console.log(isScrolled);
         setScrolled(isScrolled);
-      }
     };
     
     window.addEventListener('scroll', handleScroll);
@@ -25,8 +24,7 @@ const Navigation = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [scrolled]);
-  
+  }, []);
   // Trigger animation on component mount
   useEffect(() => {
     // Small delay to ensure animation happens after render
@@ -38,7 +36,7 @@ const Navigation = () => {
   }, []);
   
   return (
-    <nav className={`w-full fixed top-0 z-50 transition-all duration-300`}>
+    <nav className={`${scrolled ? 'bg-opacity-100' : "bg-opacity-0"} bg-slate-800 bg-opacity-0  w-full fixed top-0 z-50 transition-all duration-300`}>
       {/* Gradient background with opacity transition */}
       <div 
         className={`absolute inset-0 transition-all duration-500 ease-in-out ${

@@ -78,7 +78,7 @@ const HeroComponent = () => {
             alt="Hatchet" 
             className="w-full h-full object-contain"
             loading="eager"
-            fetchpriority="high"
+            fetchPriority="high"
           />
         </div>
         
