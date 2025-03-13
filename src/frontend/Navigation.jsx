@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom'; // Assuming you're using Next.js
 import "./styles/animations.css";
-import "./styles/navigation.css";
 
 const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -39,7 +38,7 @@ const Navigation = () => {
   }, []);
   
   return (
-    <nav className={`w-full fixed top-0 z-50 transition-all duration-300 ${scrolled ? 'nav-scrolled' : 'nav-transparent'}`}>
+    <nav className={`w-full fixed top-0 z-50 transition-all duration-300`}>
       {/* Gradient background with opacity transition */}
       <div 
         className={`absolute inset-0 transition-all duration-500 ease-in-out ${
@@ -76,9 +75,9 @@ const Navigation = () => {
               >
                 <Link 
                   to="/" 
-                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:text-gray-300 transition-all duration-300 relative overflow-hidden group"
+                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:text-gray-700 transition-all duration-300 relative overflow-hidden group"
                 >
-                  <span className="relative z-10">Home</span>
+                  <span className="relative z-10 font-black">НАЧАЛО</span>
                   <span className="absolute bottom-0 left-0 w-full h-0 bg-white bg-opacity-20 transition-all duration-300 group-hover:h-full"></span>
                 </Link>
               </li>
@@ -89,9 +88,9 @@ const Navigation = () => {
               >
                 <Link 
                   to="/booking" 
-                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:text-gray-300 transition-all duration-300 relative overflow-hidden group"
+                  className="px-3 py-2 rounded-md text-sm font-medium text-white hover:text-gray-700 transition-all duration-300 relative overflow-hidden group"
                 >
-                  <span className="relative z-10">Booking</span>
+                  <span className="relative z-10 font-black">ЗАПАЗИ ЧАС</span>
                   <span className="absolute bottom-0 left-0 w-full h-0 bg-white bg-opacity-20 transition-all duration-300 group-hover:h-full"></span>
                 </Link>
               </li>
@@ -138,8 +137,10 @@ const Navigation = () => {
           mobileMenuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className={`relative z-10 px-2 pt-2 pb-3 space-y-1 sm:px-3 mobile-menu ${
-          scrolled ? 'bg-black' : 'bg-black bg-opacity-95'
+        <div className={`relative z-10 px-2 pt-2 pb-3 space-y-1 sm:px-3 ${
+          scrolled 
+            ? 'bg-black' 
+            : 'bg-black bg-opacity-95'
         }`}>
           <Link 
             to="/" 

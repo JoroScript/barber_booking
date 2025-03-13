@@ -183,7 +183,7 @@ const HeroComponent = () => {
     <div className="relative w-full h-screen overflow-hidden">
       {/* Dark background with gradient for contrast with white hatchet */}
       <div 
-        className={`absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800 transition-opacity duration-1000 ease-out ${
+        className={`absolute inset-0  transition-opacity duration-1000 ease-out ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         style={{
