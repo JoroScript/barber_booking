@@ -1,10 +1,14 @@
-import "./react-import-helper.js";
-// Import React first to ensure it's available globally
+// Import React loader first to ensure React is globally available
+import './react-loader.js';
+
+// Import React directly to ensure it's available
 import React from 'react';
-window.React = React;
+
+// Import the ReactProvider
+import ReactProvider from './ReactProvider';
 
 // Then import other modules
-import { StrictMode, Suspense } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
@@ -37,18 +41,83 @@ const reportWebVitals = () => {
 import('./HomePage.jsx');
 import('./CalendarComponent.jsx');
 
-// Render the app with Suspense for code splitting
-const root = createRoot(document.getElementById('root'));
-root.render(
-  <StrictMode>
-    <Suspense fallback={<LoadingFallback />}>
-      <App />
-    </Suspense>
-  </StrictMode>
-);
-
-// Measure performance after load
-window.addEventListener('load', reportWebVitals);
+// Ensure React is loaded before rendering
+if (typeof window !== 'undefined' && window.isReactLoaded && window.isReactLoaded()) {
+  console.log('React is loaded, rendering app');
+  
+  // Render the app with ReactProvider to ensure React is loaded
+  const root = createRoot(document.getElementById('root'));
+  root.render(
+    <StrictMode>
+      <ReactProvider>
+        <App />
+      </ReactProvider>
+    </StrictMode>
+  );
+  
+  // Measure performance after load
+  window.addEventListener('load', reportWebVitals);
+} else {
+  console.error('React is not loaded, cannot render app');
+  
+  // Try to load React again
+  import('./react-loader.js').then(() => {
+    console.log('React loader loaded, checking if React is available');
+    
+    if (typeof window !== 'undefined' && window.isReactLoaded && window.isReactLoaded()) {
+      console.log('React is now loaded, rendering app');
+      
+      // Render the app with ReactProvider to ensure React is loaded
+      const root = createRoot(document.getElementById('root'));
+      root.render(
+        <StrictMode>
+          <ReactProvider>
+            <App />
+          </ReactProvider>
+        </StrictMode>
+      );
+      
+      // Measure performance after load
+      window.addEventListener('load', reportWebVitals);
+    } else {
+      console.error('React is still not loaded, showing error message');
+      
+      // Show error message
+      const rootElement = document.getElementById('root');
+      if (rootElement) {
+        rootElement.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; background-color: #1f2937;">
+            <div style="text-align: center; color: white;">
+              <h1 style="margin-bottom: 20px;">Error Loading Application</h1>
+              <p>There was an error loading React. Please try refreshing the page.</p>
+              <button style="margin-top: 20px; padding: 10px 20px; background-color: #f59e0b; color: black; border: none; border-radius: 5px; cursor: pointer;" onclick="window.location.reload()">
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+  }).catch(error => {
+    console.error('Error loading React loader:', error);
+    
+    // Show error message
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+      rootElement.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; background-color: #1f2937;">
+          <div style="text-align: center; color: white;">
+            <h1 style="margin-bottom: 20px;">Error Loading Application</h1>
+            <p>There was an error loading React. Please try refreshing the page.</p>
+            <button style="margin-top: 20px; padding: 10px 20px; background-color: #f59e0b; color: black; border: none; border-radius: 5px; cursor: pointer;" onclick="window.location.reload()">
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  });
+}
 
 // Enable prefetching in production
 if (import.meta.env.PROD) {

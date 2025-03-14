@@ -3,6 +3,7 @@ import { BookingProvider, useBooking } from './contexts/BookingContext';
 import StepIndicator from './components/common/StepIndicator';
 import BarberSelection from './components/booking/BarberSelection/BarberSelection';
 import ServiceSelection from './components/booking/ServiceSelection/ServiceSelection';
+import StandaloneDateSelection from './components/booking/DateSelection/StandaloneDateSelection';
 import DateSelection from './components/booking/DateSelection/DateSelection';
 import TimeSelection from './components/booking/TimeSelection/TimeSelection';
 import CustomerInfo from './components/booking/CustomerInfo/CustomerInfo';
@@ -50,7 +51,13 @@ const BookingContent = () => {
     modalMessage,
     handleModalClose,
     bookingConfirmed,
-    handleBackButton
+    handleBackButton,
+    date,
+    setDate,
+    selectedBarber,
+    setCurrentStep,
+    fullyBookedDates,
+    setFullyBookedDates
   } = useBooking();
 
   const renderCurrentStep = () => {
@@ -60,7 +67,22 @@ const BookingContent = () => {
       case 2:
         return <ServiceSelection />;
       case 3:
-        return <DateSelection />;
+        // Use the standalone DateSelection component with fallback to the original
+        try {
+          return (
+            <StandaloneDateSelection 
+              initialDate={date}
+              initialSelectedBarber={selectedBarber}
+              onDateSelected={setDate}
+              onNextStep={() => setCurrentStep(4)}
+              onSetFullyBookedDates={setFullyBookedDates}
+            />
+          );
+        } catch (error) {
+          console.error("Error rendering StandaloneDateSelection:", error);
+          // Fallback to original DateSelection if standalone fails
+          return <DateSelection />;
+        }
       case 4:
         return <TimeSelection />;
       case 5:
