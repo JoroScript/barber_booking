@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "cd src/frontend && npm run dev",
+    "build": "cd src/frontend && npm install && npm run build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "cd src/backend && npm start"
+    "preview": "cd src/frontend && npm run preview",
+    "start": "cd src/backend && npm start",
+    "netlify-build": "cd src/frontend && npm install && npm run build"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.12",

@@ -36,7 +36,7 @@ export default defineConfig({
           'vendor-api': ['axios'],
           
           // Group context providers
-          'app-context': ['/src/frontend/contexts/BookingContext.jsx'],
+          'app-context': ['./contexts/BookingContext.jsx'],
         }
       }
     },
