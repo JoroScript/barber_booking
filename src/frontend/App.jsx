@@ -1,24 +1,156 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// Import components
-import Navbar from './components/Navbar/Navbar';
-import Footer from './components/Footer/Footer';
-import HomePage from './components/HomePage/HomePage';
-import BookingPage from './components/BookingPage/BookingPage';
-import LoginPage from './components/LoginPage/LoginPage';
-import RegisterPage from './components/RegisterPage/RegisterPage';
-import AdminPage from './components/AdminPage/AdminPage';
-import UserPage from './components/UserPage/UserPage';
-import NotFoundPage from './components/NotFoundPage/NotFoundPage';
-import { BookingProvider } from './contexts/BookingContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// Simple components for testing
+const Navbar = () => (
+  <header className="bg-gray-900 text-white p-4">
+    <div className="container mx-auto flex justify-between items-center">
+      <h1 className="text-xl font-bold">Barber Shop</h1>
+      <nav>
+        <ul className="flex space-x-4">
+          <li><a href="/" className="hover:text-amber-500">Home</a></li>
+          <li><a href="/booking" className="hover:text-amber-500">Book Now</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+);
 
-// Import the standalone calendar component
-import CalendarComponent from './CalendarComponent';
+const Footer = () => (
+  <footer className="bg-gray-900 text-white p-4 mt-auto">
+    <div className="container mx-auto text-center">
+      <p>© 2023 Barber Shop. All rights reserved.</p>
+    </div>
+  </footer>
+);
+
+const HomePage = () => (
+  <div className="container mx-auto p-4">
+    <h1 className="text-3xl font-bold mb-6">Welcome to our Barber Shop</h1>
+    <p className="mb-4">We provide the best haircuts and beard trims in town.</p>
+    <a 
+      href="/booking" 
+      className="inline-block bg-amber-500 text-black px-6 py-2 rounded hover:bg-amber-600 transition-colors"
+    >
+      Book an Appointment
+    </a>
+  </div>
+);
+
+const BookingPage = () => (
+  <div className="container mx-auto p-4">
+    <h1 className="text-3xl font-bold mb-6">Book an Appointment</h1>
+    <p className="mb-4">Please use our calendar to book your appointment.</p>
+    <a 
+      href="/calendar" 
+      className="inline-block bg-amber-500 text-black px-6 py-2 rounded hover:bg-amber-600 transition-colors"
+    >
+      Open Calendar
+    </a>
+  </div>
+);
+
+const CalendarComponent = () => (
+  <div className="container mx-auto p-4">
+    <h1 className="text-3xl font-bold mb-6">Calendar</h1>
+    <p>This is a placeholder for the calendar component.</p>
+    <div className="mt-4">
+      <a 
+        href="/booking" 
+        className="inline-block bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors mr-4"
+      >
+        Back
+      </a>
+    </div>
+  </div>
+);
+
+const LoginPage = () => (
+  <div className="container mx-auto p-4 max-w-md">
+    <h1 className="text-3xl font-bold mb-6">Login</h1>
+    <form className="space-y-4">
+      <div>
+        <label className="block mb-1">Email</label>
+        <input type="email" className="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label className="block mb-1">Password</label>
+        <input type="password" className="w-full p-2 border rounded" />
+      </div>
+      <button 
+        type="submit" 
+        className="w-full bg-amber-500 text-black px-6 py-2 rounded hover:bg-amber-600 transition-colors"
+      >
+        Login
+      </button>
+    </form>
+  </div>
+);
+
+const RegisterPage = () => (
+  <div className="container mx-auto p-4 max-w-md">
+    <h1 className="text-3xl font-bold mb-6">Register</h1>
+    <form className="space-y-4">
+      <div>
+        <label className="block mb-1">Name</label>
+        <input type="text" className="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label className="block mb-1">Email</label>
+        <input type="email" className="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label className="block mb-1">Password</label>
+        <input type="password" className="w-full p-2 border rounded" />
+      </div>
+      <button 
+        type="submit" 
+        className="w-full bg-amber-500 text-black px-6 py-2 rounded hover:bg-amber-600 transition-colors"
+      >
+        Register
+      </button>
+    </form>
+  </div>
+);
+
+const NotFoundPage = () => (
+  <div className="container mx-auto p-4 text-center">
+    <h1 className="text-3xl font-bold mb-6">404 - Page Not Found</h1>
+    <p className="mb-4">The page you are looking for does not exist.</p>
+    <a 
+      href="/" 
+      className="inline-block bg-amber-500 text-black px-6 py-2 rounded hover:bg-amber-600 transition-colors"
+    >
+      Go Home
+    </a>
+  </div>
+);
+
+// Simple context providers
+const AuthContext = React.createContext();
+const useAuth = () => React.useContext(AuthContext);
+
+const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, user, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+const BookingContext = React.createContext();
+const BookingProvider = ({ children }) => {
+  return (
+    <BookingContext.Provider value={{}}>
+      {children}
+    </BookingContext.Provider>
+  );
+};
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
@@ -61,35 +193,8 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// Protected route component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
-      </div>
-    );
-  }
-  
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
-
-// Admin route component
-const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
-      </div>
-    );
-  }
-  
-  return isAuthenticated && user?.role === 'admin' ? children : <Navigate to="/" />;
-};
+// Simple toast container
+const ToastContainer = () => <div id="toast-container" className="fixed bottom-4 right-4"></div>;
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -125,6 +230,11 @@ function App() {
     );
   }
 
+  // Simple ReactProvider component
+  const ReactProvider = ({ children }) => {
+    return <>{children}</>;
+  };
+
   return (
     <ErrorBoundary>
       <AuthProvider>
@@ -139,15 +249,13 @@ function App() {
                   <Route path="/calendar" element={<CalendarComponent />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
-                  <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-                  <Route path="/profile" element={<ProtectedRoute><UserPage /></ProtectedRoute>} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </main>
               <Footer />
             </div>
           </Router>
-          <ToastContainer position="bottom-right" />
+          <ToastContainer />
         </BookingProvider>
       </AuthProvider>
     </ErrorBoundary>

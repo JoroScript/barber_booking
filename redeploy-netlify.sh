@@ -21,11 +21,16 @@ fi
 echo "Updating React configuration in vite.config.js..."
 if ! grep -q "'window.React': 'React'" vite.config.js; then
   # Add React configuration
-  sed -i "s|plugins: \[tailwindcss(), react()\],|plugins: [\n    react({\n      jsxRuntime: 'automatic',\n      jsxImportSource: 'react',\n      babel: {\n        plugins: [\n          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]\n        ]\n      }\n    }),\n    tailwindcss()\n  ],|g" vite.config.js
+  sed -i "s|plugins: \[tailwindcss(), react()\],|plugins: [\n    react(),\n    tailwindcss()\n  ],|g" vite.config.js
   
   # Add define section if it doesn't exist
   if ! grep -q "define: {" vite.config.js; then
     sed -i "/experimental: {/a \\\n  // Define global variables\n  define: {\n    // Ensure React is available globally\n    'window.React': 'React',\n    // Make process.env available\n    'process.env': process.env,\n    // Add React.useState and other hooks to global scope\n    'window.useState': 'React.useState',\n    'window.useEffect': 'React.useEffect',\n    'window.useContext': 'React.useContext',\n    'window.useCallback': 'React.useCallback',\n    'window.useMemo': 'React.useMemo',\n    'window.useRef': 'React.useRef'\n  }," vite.config.js
+  fi
+  
+  # Add rollupOptions.external if it doesn't exist
+  if ! grep -q "rollupOptions: {" vite.config.js; then
+    sed -i "/build: {/a \\\n    rollupOptions: {\n      external: [\n        // External dependencies that should be excluded from the bundle\n      ],\n    }," vite.config.js
   fi
   
   # Enable sourcemaps for debugging
@@ -38,7 +43,7 @@ if ! grep -q "'window.React': 'React'" vite.config.js; then
   
   # Add react-calendar to optimizeDeps
   if ! grep -q "'react-calendar'" vite.config.js; then
-    sed -i "s|include: \['react', 'react-dom', 'react-router-dom', 'luxon', 'axios'\]|include: ['react', 'react-dom', 'react-router-dom', 'luxon', 'axios', 'react-calendar']|g" vite.config.js
+    sed -i "s|include: \['react', 'react-dom', 'react-router-dom', 'luxon', 'axios'\]|include: ['react', 'react-dom', 'react-router-dom', 'luxon', 'axios', 'react-calendar', 'react-toastify']|g" vite.config.js
   fi
   
   echo "React configuration updated in vite.config.js"
@@ -95,12 +100,17 @@ if grep -q "import \"./react-import-helper.js\";" src/frontend/main.jsx; then
   echo "Fixing React imports in main.jsx..."
   # Create a new main.jsx file with proper imports
   cat > src/frontend/main.jsx.new << EOL
-// Import React first to ensure it's available globally
+// Import React loader first to ensure React is globally available
+import './react-loader.js';
+
+// Import React directly to ensure it's available
 import React from 'react';
-window.React = React;
+
+// Import the ReactProvider
+import ReactProvider from './ReactProvider';
 
 // Then import other modules
-import { StrictMode, Suspense } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
@@ -119,32 +129,87 @@ const reportWebVitals = () => {
     if (perfEntries.length > 0) {
       const timing = perfEntries[0];
       console.log(\`App loaded in: \${Math.round(timing.domComplete - timing.startTime)}ms\`);
-      
-      // Send to analytics if needed
-      // sendToAnalytics({
-      //   id: 'page-load',
-      //   value: Math.round(timing.domComplete - timing.startTime)
-      // });
     }
   }
 };
 
-// Preload components to ensure React is available
-import('./HomePage.jsx');
-import('./CalendarComponent.jsx');
-
-// Render the app with Suspense for code splitting
-const root = createRoot(document.getElementById('root'));
-root.render(
-  <StrictMode>
-    <Suspense fallback={<LoadingFallback />}>
-      <App />
-    </Suspense>
-  </StrictMode>
-);
-
-// Measure performance after load
-window.addEventListener('load', reportWebVitals);
+// Ensure React is loaded before rendering
+if (typeof window !== 'undefined' && window.isReactLoaded && window.isReactLoaded()) {
+  console.log('React is loaded, rendering app');
+  
+  // Render the app with ReactProvider to ensure React is loaded
+  const root = createRoot(document.getElementById('root'));
+  root.render(
+    <StrictMode>
+      <ReactProvider>
+        <App />
+      </ReactProvider>
+    </StrictMode>
+  );
+  
+  // Measure performance after load
+  window.addEventListener('load', reportWebVitals);
+} else {
+  console.error('React is not loaded, cannot render app');
+  
+  // Try to load React again
+  import('./react-loader.js').then(() => {
+    console.log('React loader loaded, checking if React is available');
+    
+    if (typeof window !== 'undefined' && window.isReactLoaded && window.isReactLoaded()) {
+      console.log('React is now loaded, rendering app');
+      
+      // Render the app with ReactProvider to ensure React is loaded
+      const root = createRoot(document.getElementById('root'));
+      root.render(
+        <StrictMode>
+          <ReactProvider>
+            <App />
+          </ReactProvider>
+        </StrictMode>
+      );
+      
+      // Measure performance after load
+      window.addEventListener('load', reportWebVitals);
+    } else {
+      console.error('React is still not loaded, showing error message');
+      
+      // Show error message
+      const rootElement = document.getElementById('root');
+      if (rootElement) {
+        rootElement.innerHTML = \`
+          <div style="display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; background-color: #1f2937;">
+            <div style="text-align: center; color: white;">
+              <h1 style="margin-bottom: 20px;">Error Loading Application</h1>
+              <p>There was an error loading React. Please try refreshing the page.</p>
+              <button style="margin-top: 20px; padding: 10px 20px; background-color: #f59e0b; color: black; border: none; border-radius: 5px; cursor: pointer;" onclick="window.location.reload()">
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        \`;
+      }
+    }
+  }).catch(error => {
+    console.error('Error loading React loader:', error);
+    
+    // Show error message
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+      rootElement.innerHTML = \`
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; background-color: #1f2937;">
+          <div style="text-align: center; color: white;">
+            <h1 style="margin-bottom: 20px;">Error Loading Application</h1>
+            <p>There was an error loading React. Please try refreshing the page.</p>
+            <button style="margin-top: 20px; padding: 10px 20px; background-color: #f59e0b; color: black; border: none; border-radius: 5px; cursor: pointer;" onclick="window.location.reload()">
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      \`;
+    }
+  });
+}
 
 // Enable prefetching in production
 if (import.meta.env.PROD) {
@@ -193,7 +258,7 @@ EOL
 else
   # Update existing tailwind.config.js to fix content pattern
   echo "Updating tailwind.config.js content pattern..."
-  sed -i 's|"./**/*.{js,ts,jsx,tsx}"|"./*.{js,jsx}",\n    "./components/**/*.{js,jsx}",\n    "./contexts/**/*.{js,jsx}",\n    "./utilities/**/*.{js,jsx}"|g' src/frontend/tailwind.config.js
+  sed -i 's|content: \["./**/*.{js,ts,jsx,tsx}"\]|content: \["./index.html", "./*.{js,jsx}", "./components/**/*.{js,jsx}", "./contexts/**/*.{js,jsx}", "./utilities/**/*.{js,jsx}"\]|g' src/frontend/tailwind.config.js
   echo "tailwind.config.js updated"
 fi
 
@@ -352,6 +417,58 @@ if ! grep -q "import './react-import-helper.js'" main.jsx; then
   sed -i '1s/^/import ".\/react-import-helper.js";\n/' main.jsx
   echo "Added React import helper to main.jsx"
 fi
+
+# Create a simplified vite.config.js
+echo "Creating simplified vite.config.js..."
+cat > vite.config.js << EOL
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from 'tailwindcss'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss()
+  ],
+  
+  // Define global variables
+  define: {
+    // Ensure React is available globally
+    'window.React': 'React',
+    // Make process.env available
+    'process.env': process.env
+  },
+  
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui': ['react-calendar', 'react-toastify']
+        }
+      }
+    }
+  },
+  
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom', 'luxon', 'axios', 'react-calendar', 'react-toastify']
+  },
+  
+  resolve: {
+    alias: {
+      './contexts/BookingContext.jsx': './contexts/BookingContext.jsx'
+    }
+  }
+})
+EOL
+echo "vite.config.js created"
+
+# Install required dependencies
+echo "Installing required dependencies..."
+npm install react-toastify@latest --save
+npm install @babel/plugin-transform-react-jsx --save-dev
 
 npm install
 npm run build

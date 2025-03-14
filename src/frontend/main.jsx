@@ -1,3 +1,4 @@
+import "./react-import-helper.js";
 // Import React loader first to ensure React is globally available
 import './react-loader.js';
 
@@ -27,19 +28,9 @@ const reportWebVitals = () => {
     if (perfEntries.length > 0) {
       const timing = perfEntries[0];
       console.log(`App loaded in: ${Math.round(timing.domComplete - timing.startTime)}ms`);
-      
-      // Send to analytics if needed
-      // sendToAnalytics({
-      //   id: 'page-load',
-      //   value: Math.round(timing.domComplete - timing.startTime)
-      // });
     }
   }
 };
-
-// Preload components to ensure React is available
-import('./HomePage.jsx');
-import('./CalendarComponent.jsx');
 
 // Ensure React is loaded before rendering
 if (typeof window !== 'undefined' && window.isReactLoaded && window.isReactLoaded()) {
