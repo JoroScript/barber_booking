@@ -17,12 +17,55 @@ if grep -q "'/src/frontend/contexts/BookingContext.jsx'" vite.config.js; then
   echo "Path fixed in vite.config.js"
 fi
 
+# Fix React configuration in vite.config.js
+echo "Updating React configuration in vite.config.js..."
+if ! grep -q "'window.React': 'React'" vite.config.js; then
+  # Add React configuration
+  sed -i "s|plugins: \[tailwindcss(), react()\],|plugins: [\n    react({\n      jsxRuntime: 'automatic',\n      jsxImportSource: 'react',\n      babel: {\n        plugins: [\n          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]\n        ]\n      }\n    }),\n    tailwindcss()\n  ],|g" vite.config.js
+  
+  # Add define section if it doesn't exist
+  if ! grep -q "define: {" vite.config.js; then
+    sed -i "/experimental: {/a \\\n  // Define global variables\n  define: {\n    // Ensure React is available globally\n    'window.React': 'React',\n    // Make process.env available\n    'process.env': process.env\n  }," vite.config.js
+  fi
+  
+  # Enable sourcemaps for debugging
+  sed -i "s|sourcemap: false,|sourcemap: true, // Enable for debugging|g" vite.config.js
+  
+  # Don't remove console logs for debugging
+  sed -i "s|drop_console: true,|drop_console: false,|g" vite.config.js
+  sed -i "s|drop_debugger: true,|drop_debugger: false,|g" vite.config.js
+  sed -i "s|pure_funcs: \['console.log', 'console.info', 'console.debug'\]|pure_funcs: []|g" vite.config.js
+  
+  echo "React configuration updated in vite.config.js"
+fi
+
 # Fix the path to main.jsx in index.html
 echo "Checking index.html for correct main.jsx path..."
 if grep -q 'src="/src/main.jsx"' src/frontend/index.html; then
   echo "Fixing path to main.jsx in index.html..."
   sed -i 's|src="/src/main.jsx"|src="./main.jsx"|g' src/frontend/index.html
   echo "Path fixed in index.html"
+fi
+
+# Fix import.meta usage in index.html
+echo "Checking index.html for import.meta usage..."
+if grep -q "import.meta.env" src/frontend/index.html && ! grep -q '<script type="module">' src/frontend/index.html; then
+  echo "Fixing import.meta usage in index.html..."
+  # Move the environment variables logging to a module script
+  sed -i '/Log environment variables/,/};/d' src/frontend/index.html
+  # Add module script at the end of body
+  cat > temp_script.html << EOL
+    <!-- Module script for environment variables -->
+    <script type="module">
+      // Log environment variables (without sensitive data)
+      console.log('Environment variables:', {
+        VITE_API_URL: import.meta.env.VITE_API_URL || 'Not set'
+      });
+    </script>
+EOL
+  sed -i '/<script type="module" src="\.\/main\.jsx"><\/script>/r temp_script.html' src/frontend/index.html
+  rm temp_script.html
+  echo "import.meta usage fixed in index.html"
 fi
 
 # Fix Tailwind CSS import in index.css
@@ -99,6 +142,7 @@ if [ $DEBUG_MODE -eq 1 ]; then
   
   # Create a debug version of App.jsx
   cat > src/frontend/App.jsx << EOL
+import React from 'react'
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './Layout'
@@ -181,6 +225,7 @@ cat > netlify.toml << EOL
 
 [build.environment]
   NODE_VERSION = "16"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [[redirects]]
   from = "/*"
@@ -204,6 +249,22 @@ echo "netlify.toml updated"
 # Building frontend
 echo "Building frontend for Netlify deployment..."
 cd src/frontend
+
+# Create a React import helper file
+echo "Creating React import helper..."
+cat > react-import-helper.js << EOL
+// This file ensures React is available globally
+import React from 'react';
+window.React = React;
+EOL
+echo "React import helper created"
+
+# Update main.jsx to import the helper
+if ! grep -q "import './react-import-helper.js'" main.jsx; then
+  sed -i '1s/^/import ".\/react-import-helper.js";\n/' main.jsx
+  echo "Added React import helper to main.jsx"
+fi
+
 npm install
 npm run build
 
@@ -253,6 +314,7 @@ if [ $DEBUG_MODE -eq 1 ]; then
         <li>White screen: Check browser console for JavaScript errors</li>
         <li>404 errors: Make sure _redirects file is in the dist directory</li>
         <li>API connection issues: Verify CORS settings in your backend</li>
+        <li>React not defined: Check if React is properly imported</li>
       </ul>
     </div>
     

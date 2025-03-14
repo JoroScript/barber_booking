@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Info</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+    pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Deployment Debug Info</h1>
+    
+    <div class="card">
+      <h2>Environment Variables</h2>
+      <p>Check if your environment variables are correctly set in Netlify:</p>
+      <ul>
+        <li>VITE_API_URL: Should point to your Railway backend URL</li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h2>Common Issues</h2>
+      <ul>
+        <li>White screen: Check browser console for JavaScript errors</li>
+        <li>404 errors: Make sure _redirects file is in the dist directory</li>
+        <li>API connection issues: Verify CORS settings in your backend</li>
+        <li>React not defined: Check if React is properly imported</li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h2>Navigation</h2>
+      <ul>
+        <li><a href="/">Home Page</a></li>
+        <li><a href="/booking">Booking Page</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <script>
+    // Log environment variables
+    console.log('Debug page loaded');
+    document.addEventListener('DOMContentLoaded', function() {
+      const envSection = document.querySelector('.card:first-of-type');
+      const envInfo = document.createElement('pre');
+      envInfo.textContent = 'Checking environment variables...';
+      envSection.appendChild(envInfo);
+      
+      try {
+        // This will only work if the script is loaded as a module
+        const envVars = {
+          'VITE_API_URL': window.VITE_API_URL || 'Not available in this context'
+        };
+        envInfo.textContent = JSON.stringify(envVars, null, 2);
+      } catch (err) {
+        envInfo.textContent = 'Error checking environment variables: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -5,7 +5,19 @@ import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [tailwindcss(), react()],
+  plugins: [
+    react({
+      // Add this to ensure React is properly included
+      jsxRuntime: 'automatic',
+      jsxImportSource: 'react',
+      babel: {
+        plugins: [
+          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
+        ]
+      }
+    }),
+    tailwindcss()
+  ],
   
   // Set the root directory to src/frontend
   root: resolve(__dirname, 'src/frontend'),
@@ -16,7 +28,7 @@ export default defineConfig({
     outDir: resolve(__dirname, 'src/frontend/dist'),
     
     // Enable source maps for production debugging if needed
-    sourcemap: false,
+    sourcemap: true, // Enable for debugging
     
     // Optimize chunk size
     chunkSizeWarningLimit: 800,
@@ -48,12 +60,12 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        // Remove console logs in production
-        drop_console: true,
-        // Remove debugger statements
-        drop_debugger: true,
+        // Don't remove console logs for debugging
+        drop_console: false,
+        // Don't remove debugger statements for debugging
+        drop_debugger: false,
         // Pure functions side-effect removal
-        pure_funcs: ['console.log', 'console.info', 'console.debug']
+        pure_funcs: []
       }
     }
   },
@@ -77,5 +89,13 @@ export default defineConfig({
       // Add cache busting for assets
       return `/${filename}?v=${Date.now()}`
     }
+  },
+  
+  // Define global variables
+  define: {
+    // Ensure React is available globally
+    'window.React': 'React',
+    // Make process.env available
+    'process.env': process.env
   }
 })
