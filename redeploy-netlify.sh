@@ -17,6 +17,78 @@ if grep -q "'/src/frontend/contexts/BookingContext.jsx'" vite.config.js; then
   echo "Path fixed in vite.config.js"
 fi
 
+# Fix the path to main.jsx in index.html
+echo "Checking index.html for correct main.jsx path..."
+if grep -q 'src="/src/main.jsx"' src/frontend/index.html; then
+  echo "Fixing path to main.jsx in index.html..."
+  sed -i 's|src="/src/main.jsx"|src="./main.jsx"|g' src/frontend/index.html
+  echo "Path fixed in index.html"
+fi
+
+# Fix Tailwind CSS import in index.css
+echo "Checking index.css for correct Tailwind CSS import..."
+if grep -q '@import "tailwindcss"' src/frontend/index.css; then
+  echo "Fixing Tailwind CSS import in index.css..."
+  sed -i '1s|@import "tailwindcss"|@tailwind base;\n@tailwind components;\n@tailwind utilities|' src/frontend/index.css
+  echo "Tailwind CSS import fixed in index.css"
+fi
+
+# Fix import order in index.css
+echo "Checking index.css for correct import order..."
+if ! grep -q '\/\* Import other CSS files \*\/' src/frontend/index.css; then
+  echo "Fixing import order in index.css..."
+  sed -i 's|@tailwind utilities;\n@import|@tailwind utilities;\n\n/* Import other CSS files */\n@import|g' src/frontend/index.css
+  echo "Import order fixed in index.css"
+fi
+
+# Ensure tailwind.config.js exists
+echo "Checking for tailwind.config.js..."
+if [ ! -f "src/frontend/tailwind.config.js" ]; then
+  echo "Creating tailwind.config.js..."
+  cat > src/frontend/tailwind.config.js << EOL
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./*.{js,jsx}",
+    "./components/**/*.{js,jsx}",
+    "./contexts/**/*.{js,jsx}",
+    "./utilities/**/*.{js,jsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'primary': '#f59e0b',
+        'secondary': '#111827',
+      },
+    },
+  },
+  plugins: [],
+}
+EOL
+  echo "tailwind.config.js created"
+else
+  # Update existing tailwind.config.js to fix content pattern
+  echo "Updating tailwind.config.js content pattern..."
+  sed -i 's|"./**/*.{js,ts,jsx,tsx}"|"./*.{js,jsx}",\n    "./components/**/*.{js,jsx}",\n    "./contexts/**/*.{js,jsx}",\n    "./utilities/**/*.{js,jsx}"|g' src/frontend/tailwind.config.js
+  echo "tailwind.config.js updated"
+fi
+
+# Ensure postcss.config.js exists
+echo "Checking for postcss.config.js..."
+if [ ! -f "src/frontend/postcss.config.js" ]; then
+  echo "Creating postcss.config.js..."
+  cat > src/frontend/postcss.config.js << EOL
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+EOL
+  echo "postcss.config.js created"
+fi
+
 # If in debug mode, create a backup of App.jsx and use the debug version
 if [ $DEBUG_MODE -eq 1 ]; then
   echo "Creating debug version of the application..."

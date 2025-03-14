@@ -1,6 +1,9 @@
-@import "tailwindcss";
-@import './CalendarComponent.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Import other CSS files */
+@import './CalendarComponent.css';
 
 /* Global styles to prevent horizontal scrolling */
 html, body {
