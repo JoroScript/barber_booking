@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cp public/_redirects dist/",
     "postbuild": "cp _redirects dist/",
     "preview": "vite preview"
   },

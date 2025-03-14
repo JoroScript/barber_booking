@@ -1,13 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   
+  // Set the root directory to src/frontend
+  root: resolve(__dirname, 'src/frontend'),
+  
   // Optimize build configuration
   build: {
+    // Output directory relative to the root
+    outDir: resolve(__dirname, 'src/frontend/dist'),
+    
     // Enable source maps for production debugging if needed
     sourcemap: false,
     
