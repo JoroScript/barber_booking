@@ -35,7 +35,7 @@ const lockCache = new NodeCache({ stdTTL: 120 });
 const eventCache = new NodeCache({ stdTTL: 300 }); // Cache events for 5 minutes
 
 app.use(cors({
-  origin: ['http://localhost:5173','http://localhost:5174'], // Add your frontend URL here
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://theborzz.netlify.app'], // Frontend URLs
 }));
 app.use(express.json()); // Required for parsing JSON requests
 

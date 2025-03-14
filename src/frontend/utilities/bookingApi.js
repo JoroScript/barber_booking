@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { DateTime } from 'luxon';
 
+// Get the API URL from environment variables
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5005';
+
 // Configure axios with a timeout and cache
 const api = axios.create({
-  baseURL: 'http://localhost:5005/api',
+  baseURL: `${API_URL}/api`,
   timeout: 5000,
   headers: { "Cache-Control": "max-age=300" }, // 5 minute cache
 });
