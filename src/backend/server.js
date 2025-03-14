@@ -49,14 +49,48 @@ app.use(cors({
 app.use(express.json()); // Required for parsing JSON requests
 
 // Use the absolute path to the service account key file
-const serviceAccount = JSON.parse(fs.readFileSync(path.join(__dirname, 'service-account-key.json'), 'utf8'));
+let serviceAccount;
+let jwtClient;
 
-const jwtClient = new google.auth.JWT(
-  serviceAccount.client_email,
-  null,
-  serviceAccount.private_key,
-  ['https://www.googleapis.com/auth/calendar.events']
-);
+try {
+  const serviceAccountPath = path.join(__dirname, 'service-account-key.json');
+  console.log('Looking for service account key at:', serviceAccountPath);
+  
+  if (fs.existsSync(serviceAccountPath)) {
+    serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+    console.log('Service account key loaded successfully');
+    
+    jwtClient = new google.auth.JWT(
+      serviceAccount.client_email,
+      null,
+      serviceAccount.private_key,
+      ['https://www.googleapis.com/auth/calendar.events']
+    );
+  } else {
+    console.error('Service account key file not found at:', serviceAccountPath);
+    
+    // Check if service account details are available in environment variables
+    if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+      console.log('Using service account details from environment variables');
+      
+      serviceAccount = {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
+      };
+      
+      jwtClient = new google.auth.JWT(
+        serviceAccount.client_email,
+        null,
+        serviceAccount.private_key,
+        ['https://www.googleapis.com/auth/calendar.events']
+      );
+    } else {
+      console.error('No service account details available. Calendar functionality will not work.');
+    }
+  }
+} catch (error) {
+  console.error('Error loading service account key:', error);
+}
 
 // Map barber IDs to their corresponding calendar IDs
 const barberCalendars = {
