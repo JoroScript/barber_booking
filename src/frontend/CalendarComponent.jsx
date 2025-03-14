@@ -14,7 +14,36 @@ import './CalendarComponent.css';
 console.log('CalendarComponent: React is available:', !!React);
 console.log('CalendarComponent: useState is available:', !!React.useState);
 
+// Create a wrapper component to ensure React is loaded
+const ReactLoadedWrapper = ({ children }) => {
+  // Use React directly to ensure it's available
+  const [isLoaded, setIsLoaded] = React.useState(false);
+  
+  React.useEffect(() => {
+    console.log('ReactLoadedWrapper mounted, React hooks are working');
+    setIsLoaded(true);
+  }, []);
+  
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center h-screen w-screen bg-gray-900">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p>Loading Calendar...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return <>{children}</>;
+};
+
 const BookingContent = () => {
+  // Use React directly to ensure it's available
+  React.useEffect(() => {
+    console.log('BookingContent mounted, React hooks are working');
+  }, []);
+  
   const {
     currentStep,
     modalOpen,
@@ -43,7 +72,6 @@ const BookingContent = () => {
 
   return (
     <div className="booking-container">
-
       {!bookingConfirmed && <StepIndicator />}
 
       <div className="booking-content">
@@ -69,9 +97,11 @@ const BookingContent = () => {
 
 const CalendarComponent = () => {
   return (
-    <BookingProvider>
-      <BookingContent />
-    </BookingProvider>
+    <ReactLoadedWrapper>
+      <BookingProvider>
+        <BookingContent />
+      </BookingProvider>
+    </ReactLoadedWrapper>
   );
 };
 

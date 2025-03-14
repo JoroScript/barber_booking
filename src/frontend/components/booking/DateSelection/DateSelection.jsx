@@ -6,10 +6,19 @@ import { fetchMonthEvents } from '../../../utilities/bookingApi';
 import { BUSINESS_HOURS } from '../../../utilities/constants';
 import './DateSelection.css';
 
-// Use the global React hooks
-const { useState, useEffect, useCallback, useMemo } = React;
+// Verify React is available
+console.log('DateSelection: React is available:', !!React);
+console.log('DateSelection: useState is available:', !!React.useState);
 
 const DateSelection = () => {
+  // Use React directly to ensure it's available
+  const [cachedMonthData, setCachedMonthData] = React.useState({});
+  
+  // Verify React hooks are working
+  React.useEffect(() => {
+    console.log('DateSelection component mounted, React hooks are working');
+  }, []);
+  
   const {
     date,
     setDate,
@@ -23,21 +32,18 @@ const DateSelection = () => {
     setCurrentMonth
   } = useBooking();
 
-  // Cache for storing previously fetched month data
-  const [cachedMonthData, setCachedMonthData] = useState({});
-
-  const getCacheKey = useCallback((month, barberId) => {
+  const getCacheKey = React.useCallback((month, barberId) => {
     return `${month.getFullYear()}-${month.getMonth()}-${barberId}`;
   }, []);
 
   // Bulgarian weekday abbreviations
-  const formatShortWeekday = useCallback((locale, date) => {
+  const formatShortWeekday = React.useCallback((locale, date) => {
     const weekdays = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
     return weekdays[date.getDay()];
   }, []);
 
   // Bulgarian month names
-  const formatMonthYear = useCallback((locale, date) => {
+  const formatMonthYear = React.useCallback((locale, date) => {
     const months = [
       'Януари', 'Февруари', 'Март', 'Април', 'Май', 'Юни',
       'Юли', 'Август', 'Септември', 'Октомври', 'Ноември', 'Декември'
@@ -45,7 +51,7 @@ const DateSelection = () => {
     return `${months[date.getMonth()]} ${date.getFullYear()}`;
   }, []);
 
-  const processBookedDates = useCallback((events, startOfMonth, endOfMonth) => {
+  const processBookedDates = React.useCallback((events, startOfMonth, endOfMonth) => {
     const bookedHoursPerDate = new Map();
     const totalBusinessHours = BUSINESS_HOURS.length;
 
@@ -71,7 +77,7 @@ const DateSelection = () => {
       .map(([date]) => date);
   }, []);
 
-  const checkFullyBookedDates = useCallback(async () => {
+  const checkFullyBookedDates = React.useCallback(async () => {
     if (!selectedBarber) return;
     
     const cacheKey = getCacheKey(currentMonth, selectedBarber);
@@ -105,7 +111,7 @@ const DateSelection = () => {
     }
   }, [selectedBarber, currentMonth, processBookedDates, setFullyBookedDates, setIsMonthLoading, cachedMonthData, getCacheKey]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!selectedBarber) {
       setFullyBookedDates([]);
       return;
@@ -118,7 +124,7 @@ const DateSelection = () => {
     return () => clearTimeout(timeoutId);
   }, [selectedBarber, currentMonth, checkFullyBookedDates, setFullyBookedDates]);
 
-  const handleDateChange = useCallback((newDate) => {
+  const handleDateChange = React.useCallback((newDate) => {
     if (isMonthLoading) return;
 
     const formattedDate = DateTime.fromJSDate(newDate)
@@ -131,11 +137,11 @@ const DateSelection = () => {
     }
   }, [isMonthLoading, fullyBookedDates, setDate, setCurrentStep]);
 
-  const handleMonthChange = useCallback(({ activeStartDate }) => {
+  const handleMonthChange = React.useCallback(({ activeStartDate }) => {
     setCurrentMonth(activeStartDate);
   }, [setCurrentMonth]);
 
-  const isDateDisabled = useCallback(({ date }) => {
+  const isDateDisabled = React.useCallback(({ date }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (date < today) return true;
@@ -146,7 +152,7 @@ const DateSelection = () => {
     return fullyBookedDates.includes(formattedDate);
   }, [fullyBookedDates]);
 
-  const getTileClassName = useCallback(({ date: tileDate, view }) => {
+  const getTileClassName = React.useCallback(({ date: tileDate, view }) => {
     if (view !== "month") return "";
 
     const formattedDate = DateTime.fromJSDate(tileDate)
@@ -166,7 +172,7 @@ const DateSelection = () => {
   }, [fullyBookedDates, date]);
 
   // Memoize calendar to prevent unnecessary re-renders
-  const calendarComponent = useMemo(() => (
+  const calendarComponent = React.useMemo(() => (
     <Calendar
       onChange={handleDateChange}
       value={date}

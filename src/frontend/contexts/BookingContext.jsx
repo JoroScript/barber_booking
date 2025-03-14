@@ -1,13 +1,16 @@
 import React from 'react';
 import { DateTime } from 'luxon';
 
-// Use the global React hooks and createContext
-const { createContext, useContext, useState } = React;
+// Verify React is available
+console.log('BookingContext: React is available:', !!React);
+console.log('BookingContext: createContext is available:', !!React.createContext);
+console.log('BookingContext: useState is available:', !!React.useState);
 
-const BookingContext = createContext();
+// Create context using React directly
+const BookingContext = React.createContext();
 
 export const useBooking = () => {
-  const context = useContext(BookingContext);
+  const context = React.useContext(BookingContext);
   if (!context) {
     throw new Error('useBooking must be used within a BookingProvider');
   }
@@ -15,31 +18,36 @@ export const useBooking = () => {
 };
 
 export const BookingProvider = ({ children }) => {
+  // Verify React hooks are working
+  React.useEffect(() => {
+    console.log('BookingProvider mounted, React hooks are working');
+  }, []);
+
   // Step management
-  const [currentStep, setCurrentStep] = useState(1);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [currentStep, setCurrentStep] = React.useState(1);
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalMessage, setModalMessage] = React.useState("");
   
   // Form data
-  const [selectedBarber, setSelectedBarber] = useState("");
-  const [selectedService, setSelectedService] = useState("");
-  const [date, setDate] = useState(null);
-  const [time, setTime] = useState(null);
-  const [customerInfo, setCustomerInfo] = useState({
+  const [selectedBarber, setSelectedBarber] = React.useState("");
+  const [selectedService, setSelectedService] = React.useState("");
+  const [date, setDate] = React.useState(null);
+  const [time, setTime] = React.useState(null);
+  const [customerInfo, setCustomerInfo] = React.useState({
     name: "",
     email: "",
     phoneNumber: "",
   });
 
   // Booking confirmation state
-  const [bookingConfirmed, setBookingConfirmed] = useState(false);
-  const [bookingSummary, setBookingSummary] = useState(null);
+  const [bookingConfirmed, setBookingConfirmed] = React.useState(false);
+  const [bookingSummary, setBookingSummary] = React.useState(null);
 
   // Calendar data
-  const [appointments, setAppointments] = useState([]);
-  const [fullyBookedDates, setFullyBookedDates] = useState([]);
-  const [isMonthLoading, setIsMonthLoading] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [appointments, setAppointments] = React.useState([]);
+  const [fullyBookedDates, setFullyBookedDates] = React.useState([]);
+  const [isMonthLoading, setIsMonthLoading] = React.useState(false);
+  const [currentMonth, setCurrentMonth] = React.useState(new Date());
 
   const handleBackButton = () => {
     // Clear the state for the current step before going back

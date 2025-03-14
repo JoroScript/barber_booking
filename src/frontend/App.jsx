@@ -6,6 +6,10 @@ import Layout from './Layout'
 import HomePage from './HomePage'
 import CalendarComponent from './CalendarComponent'
 
+// Verify React is loaded
+console.log('App.jsx: React is available:', !!React);
+console.log('App.jsx: useState is available:', !!React.useState);
+
 // Loading component for route transitions
 const RouteLoadingFallback = () => (
   <div className="flex items-center justify-center h-[calc(100vh-64px)] w-full bg-gray-900">
@@ -14,6 +18,11 @@ const RouteLoadingFallback = () => (
 )
 
 function App() {
+  // Verify React hooks are available
+  React.useEffect(() => {
+    console.log('App component mounted, React hooks are working');
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
