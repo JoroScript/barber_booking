@@ -85,7 +85,19 @@ This guide provides step-by-step instructions for deploying the Barber Booking a
      - `EMAIL_USER`: Your email address for sending notifications
      - `EMAIL_PASS`: Your email password or app password
      - `CALENDAR_ID`: Your Google Calendar ID
+     - `GOOGLE_CLIENT_EMAIL`: The client_email from your service-account-key.json
+     - `GOOGLE_PRIVATE_KEY`: The private_key from your service-account-key.json (include all newlines and quotes)
      - Add any other environment variables your application needs
+
+4. **Setting up Google Service Account credentials**:
+   - Open your `service-account-key.json` file
+   - Find the `client_email` field and copy its value to the `GOOGLE_CLIENT_EMAIL` environment variable
+   - Find the `private_key` field and copy its entire value (including BEGIN/END lines and newlines) to the `GOOGLE_PRIVATE_KEY` environment variable
+   - When adding the private key to Railway:
+     - Go to Railway dashboard > Your project > Variables
+     - Add a new variable named `GOOGLE_PRIVATE_KEY`
+     - Paste the entire private key including BEGIN/END lines and newlines
+     - Railway will handle the formatting correctly
 
 ### Option 2: Deploy via Railway CLI
 
@@ -144,6 +156,10 @@ If environment variables are not being loaded:
 - Check the Railway dashboard to ensure all variables are set
 - Verify the `.env` file format if using local development
 - Redeploy the application after updating environment variables
+- For Google service account issues:
+  - Ensure both `GOOGLE_CLIENT_EMAIL` and `GOOGLE_PRIVATE_KEY` are set correctly
+  - The private key should include all newlines and quotes
+  - Check the server logs for any specific errors related to JWT client creation
 
 ## Maintenance
 

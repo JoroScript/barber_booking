@@ -58,7 +58,7 @@ try {
   
   if (fs.existsSync(serviceAccountPath)) {
     serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-    console.log('Service account key loaded successfully');
+    console.log('Service account key loaded successfully from file');
     
     jwtClient = new google.auth.JWT(
       serviceAccount.client_email,
@@ -67,25 +67,36 @@ try {
       ['https://www.googleapis.com/auth/calendar.events']
     );
   } else {
-    console.error('Service account key file not found at:', serviceAccountPath);
+    console.log('Service account key file not found at:', serviceAccountPath);
     
     // Check if service account details are available in environment variables
     if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
       console.log('Using service account details from environment variables');
       
-      serviceAccount = {
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
-      };
-      
-      jwtClient = new google.auth.JWT(
-        serviceAccount.client_email,
-        null,
-        serviceAccount.private_key,
-        ['https://www.googleapis.com/auth/calendar.events']
-      );
+      try {
+        // Make sure to properly handle the private key formatting
+        const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+        
+        serviceAccount = {
+          client_email: process.env.GOOGLE_CLIENT_EMAIL,
+          private_key: privateKey
+        };
+        
+        jwtClient = new google.auth.JWT(
+          serviceAccount.client_email,
+          null,
+          serviceAccount.private_key,
+          ['https://www.googleapis.com/auth/calendar.events']
+        );
+        
+        console.log('JWT client created successfully with environment variables');
+      } catch (envError) {
+        console.error('Error creating JWT client with environment variables:', envError);
+        throw envError;
+      }
     } else {
-      console.error('No service account details available. Calendar functionality will not work.');
+      console.error('No service account details available in environment variables. Calendar functionality will not work.');
+      console.log('Required environment variables: GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY');
     }
   }
 } catch (error) {
