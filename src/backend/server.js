@@ -6,8 +6,17 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables from the .env file in the project root
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+// Try to load environment variables from the .env file in the backend directory
+// If that fails, try the root directory
+try {
+  const result = dotenv.config({ path: path.join(__dirname, '.env') });
+  if (result.error) {
+    console.log('Could not find .env file in backend directory, trying root directory...');
+    dotenv.config({ path: path.join(__dirname, '../../.env') });
+  }
+} catch (error) {
+  console.error('Error loading .env file:', error);
+}
 
 // Log environment variables for debugging (without showing the actual password)
 console.log('Environment variables loaded:');

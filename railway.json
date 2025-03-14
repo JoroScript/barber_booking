@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd src/backend && npm install"
+    "buildCommand": "cd src/backend && npm install && cp service-account-key.json /app/src/backend/"
   },
   "deploy": {
     "startCommand": "cd src/backend && npm start",

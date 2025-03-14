@@ -10,4 +10,5 @@ node_modules/
 .idea/
 
 # Keep backend files
-!src/backend/ 
+!src/backend/
+!src/backend/service-account-key.json 
