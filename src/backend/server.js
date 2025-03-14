@@ -528,7 +528,63 @@ app.get('/api/get-month-events', async (req, res) => {
 
 // Add a health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    memory: process.memoryUsage(),
+    uptime: process.uptime()
+  });
+});
+
+// Add a global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ 
+    error: 'Internal server error', 
+    message: process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : err.message 
+  });
+});
+
+// Handle process signals gracefully
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received. Closing server gracefully...');
+  // Close any database connections or other resources here
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT signal received. Closing server gracefully...');
+  // Close any database connections or other resources here
+  process.exit(0);
+});
+
+// Monitor memory usage
+const memoryMonitor = setInterval(() => {
+  const memoryUsage = process.memoryUsage();
+  console.log(`Memory usage: RSS=${Math.round(memoryUsage.rss / 1024 / 1024)}MB, Heap=${Math.round(memoryUsage.heapUsed / 1024 / 1024)}/${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`);
+  
+  // If memory usage is too high, log a warning
+  if (memoryUsage.rss > 500 * 1024 * 1024) { // 500MB
+    console.warn('WARNING: High memory usage detected');
+  }
+}, 60000); // Check every minute
+
+// Clean up on exit
+process.on('exit', () => {
+  clearInterval(memoryMonitor);
+  console.log('Server shutting down');
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+  // Don't exit the process, just log the error
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled promise rejection:', reason);
+  // Don't exit the process, just log the error
 });
 
 app.listen(process.env.PORT, () => {

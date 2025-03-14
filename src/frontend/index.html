@@ -11,9 +11,39 @@
     <!-- Preconnect to API server -->
     <link rel="preconnect" href="https://barberbooking-production.up.railway.app" crossorigin />
     
-    <!-- ... rest of the file remains unchanged ... -->
+    <!-- Add error logging script -->
+    <script type="text/javascript">
+      window.onerror = function(message, source, lineno, colno, error) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.padding = '20px';
+        errorDiv.style.margin = '20px';
+        errorDiv.style.backgroundColor = '#ffeeee';
+        errorDiv.style.border = '1px solid #ff0000';
+        errorDiv.style.borderRadius = '5px';
+        errorDiv.style.fontFamily = 'monospace';
+        errorDiv.style.whiteSpace = 'pre-wrap';
+        errorDiv.style.overflow = 'auto';
+        errorDiv.style.maxHeight = '80vh';
+        
+        errorDiv.innerHTML = `<h2>JavaScript Error</h2>
+          <p><strong>Message:</strong> ${message}</p>
+          <p><strong>Source:</strong> ${source}</p>
+          <p><strong>Line:</strong> ${lineno}, <strong>Column:</strong> ${colno}</p>
+          <p><strong>Stack:</strong> ${error && error.stack ? error.stack : 'No stack available'}</p>`;
+        
+        document.body.appendChild(errorDiv);
+        
+        return false;
+      };
+
+      // Log environment variables (without sensitive data)
+      console.log('Environment variables:', {
+        VITE_API_URL: import.meta.env.VITE_API_URL || 'Not set'
+      });
+    </script>
   </head>
   <body>
-    <!-- ... rest of the file remains unchanged ... -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html> 
