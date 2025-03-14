@@ -10,6 +10,10 @@ import BookingConfirmation from './components/booking/BookingConfirmation/Bookin
 import UnavailableSlotModal from './UnavailableSlotModal';
 import './CalendarComponent.css';
 
+// Ensure React is available
+console.log('CalendarComponent: React is available:', !!React);
+console.log('CalendarComponent: useState is available:', !!React.useState);
+
 const BookingContent = () => {
   const {
     currentStep,
@@ -55,10 +59,10 @@ const BookingContent = () => {
       </div>
 
       <UnavailableSlotModal
-  isOpen={modalOpen}
-  onClose={handleModalClose}
-  message={modalMessage}
-/>
+        isOpen={modalOpen}
+        onClose={handleModalClose}
+        message={modalMessage}
+      />
     </div>
   );
 };

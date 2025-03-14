@@ -1,5 +1,8 @@
-import React, { createContext, useContext, useState } from 'react';
+import React from 'react';
 import { DateTime } from 'luxon';
+
+// Use the global React hooks and createContext
+const { createContext, useContext, useState } = React;
 
 const BookingContext = createContext();
 

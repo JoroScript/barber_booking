@@ -1,11 +1,10 @@
 import React from "react"
-import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './Layout'
 
-// Lazy load components for better code splitting
-const HomePage = lazy(() => import('./HomePage'))
-const CalendarComponent = lazy(() => import('./CalendarComponent'))
+// Import components directly instead of lazy loading
+import HomePage from './HomePage'
+import CalendarComponent from './CalendarComponent'
 
 // Loading component for route transitions
 const RouteLoadingFallback = () => (
@@ -19,16 +18,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={
-            <Suspense fallback={<RouteLoadingFallback />}>
-              <HomePage />
-            </Suspense>
-          } />
-          <Route path="/booking" element={
-            <Suspense fallback={<RouteLoadingFallback />}>
-              <CalendarComponent />
-            </Suspense>
-          } />
+          <Route index element={<HomePage />} />
+          <Route path="/booking" element={<CalendarComponent />} />
         </Route>
       </Routes>
     </BrowserRouter>

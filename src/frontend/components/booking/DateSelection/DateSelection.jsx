@@ -1,10 +1,13 @@
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import React from 'react';
 import { useBooking } from '../../../contexts/BookingContext';
 import { DateTime } from 'luxon';
 import Calendar from 'react-calendar';
 import { fetchMonthEvents } from '../../../utilities/bookingApi';
 import { BUSINESS_HOURS } from '../../../utilities/constants';
 import './DateSelection.css';
+
+// Use the global React hooks
+const { useState, useEffect, useCallback, useMemo } = React;
 
 const DateSelection = () => {
   const {
