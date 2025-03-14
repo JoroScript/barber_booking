@@ -1,0 +1,13 @@
+# Ignore frontend files
+src/frontend/
+dist/
+node_modules/
+
+# Ignore development files
+.git/
+.github/
+.vscode/
+.idea/
+
+# Keep backend files
+!src/backend/ 
