@@ -25,7 +25,7 @@ if ! grep -q "'window.React': 'React'" vite.config.js; then
   
   # Add define section if it doesn't exist
   if ! grep -q "define: {" vite.config.js; then
-    sed -i "/experimental: {/a \\\n  // Define global variables\n  define: {\n    // Ensure React is available globally\n    'window.React': 'React',\n    // Make process.env available\n    'process.env': process.env\n  }," vite.config.js
+    sed -i "/experimental: {/a \\\n  // Define global variables\n  define: {\n    // Ensure React is available globally\n    'window.React': 'React',\n    // Make process.env available\n    'process.env': process.env,\n    // Add React.useState and other hooks to global scope\n    'window.useState': 'React.useState',\n    'window.useEffect': 'React.useEffect',\n    'window.useContext': 'React.useContext',\n    'window.useCallback': 'React.useCallback',\n    'window.useMemo': 'React.useMemo',\n    'window.useRef': 'React.useRef'\n  }," vite.config.js
   fi
   
   # Enable sourcemaps for debugging
@@ -35,6 +35,11 @@ if ! grep -q "'window.React': 'React'" vite.config.js; then
   sed -i "s|drop_console: true,|drop_console: false,|g" vite.config.js
   sed -i "s|drop_debugger: true,|drop_debugger: false,|g" vite.config.js
   sed -i "s|pure_funcs: \['console.log', 'console.info', 'console.debug'\]|pure_funcs: []|g" vite.config.js
+  
+  # Add react-calendar to optimizeDeps
+  if ! grep -q "'react-calendar'" vite.config.js; then
+    sed -i "s|include: \['react', 'react-dom', 'react-router-dom', 'luxon', 'axios'\]|include: ['react', 'react-dom', 'react-router-dom', 'luxon', 'axios', 'react-calendar']|g" vite.config.js
+  fi
   
   echo "React configuration updated in vite.config.js"
 fi
@@ -82,6 +87,81 @@ if ! grep -q '\/\* Import other CSS files \*\/' src/frontend/index.css; then
   echo "Fixing import order in index.css..."
   sed -i 's|@tailwind utilities;\n@import|@tailwind utilities;\n\n/* Import other CSS files */\n@import|g' src/frontend/index.css
   echo "Import order fixed in index.css"
+fi
+
+# Fix main.jsx to ensure React is properly loaded
+echo "Checking main.jsx for proper React loading..."
+if grep -q "import \"./react-import-helper.js\";" src/frontend/main.jsx; then
+  echo "Fixing React imports in main.jsx..."
+  # Create a new main.jsx file with proper imports
+  cat > src/frontend/main.jsx.new << EOL
+// Import React first to ensure it's available globally
+import React from 'react';
+window.React = React;
+
+// Then import other modules
+import { StrictMode, Suspense } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+// Add a loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen w-screen bg-gray-900">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-500"></div>
+  </div>
+);
+
+// Create a performance measurement
+const reportWebVitals = () => {
+  if (window.performance) {
+    const perfEntries = window.performance.getEntriesByType('navigation');
+    if (perfEntries.length > 0) {
+      const timing = perfEntries[0];
+      console.log(\`App loaded in: \${Math.round(timing.domComplete - timing.startTime)}ms\`);
+      
+      // Send to analytics if needed
+      // sendToAnalytics({
+      //   id: 'page-load',
+      //   value: Math.round(timing.domComplete - timing.startTime)
+      // });
+    }
+  }
+};
+
+// Preload components to ensure React is available
+import('./HomePage.jsx');
+import('./CalendarComponent.jsx');
+
+// Render the app with Suspense for code splitting
+const root = createRoot(document.getElementById('root'));
+root.render(
+  <StrictMode>
+    <Suspense fallback={<LoadingFallback />}>
+      <App />
+    </Suspense>
+  </StrictMode>
+);
+
+// Measure performance after load
+window.addEventListener('load', reportWebVitals);
+
+// Enable prefetching in production
+if (import.meta.env.PROD) {
+  // Prefetch other chunks when idle
+  window.addEventListener('load', () => {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        // Prefetch additional routes that might be needed soon
+        import('./HomePage.jsx');
+        import('./CalendarComponent.jsx');
+      });
+    }
+  });
+}
+EOL
+  mv src/frontend/main.jsx.new src/frontend/main.jsx
+  echo "React imports fixed in main.jsx"
 fi
 
 # Ensure tailwind.config.js exists
@@ -256,6 +336,14 @@ cat > react-import-helper.js << EOL
 // This file ensures React is available globally
 import React from 'react';
 window.React = React;
+
+// Make React hooks available globally
+window.useState = React.useState;
+window.useEffect = React.useEffect;
+window.useContext = React.useContext;
+window.useCallback = React.useCallback;
+window.useMemo = React.useMemo;
+window.useRef = React.useRef;
 EOL
 echo "React import helper created"
 

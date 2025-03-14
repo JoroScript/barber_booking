@@ -76,7 +76,7 @@ export default defineConfig({
     compress: true,
     // Optimize dependencies pre-bundling
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom', 'luxon', 'axios']
+      include: ['react', 'react-dom', 'react-router-dom', 'luxon', 'axios', 'react-calendar']
     }
   },
   
@@ -96,6 +96,13 @@ export default defineConfig({
     // Ensure React is available globally
     'window.React': 'React',
     // Make process.env available
-    'process.env': process.env
+    'process.env': process.env,
+    // Add React.useState and other hooks to global scope
+    'window.useState': 'React.useState',
+    'window.useEffect': 'React.useEffect',
+    'window.useContext': 'React.useContext',
+    'window.useCallback': 'React.useCallback',
+    'window.useMemo': 'React.useMemo',
+    'window.useRef': 'React.useRef'
   }
 })
